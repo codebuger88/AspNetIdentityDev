@@ -4,17 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="AspnetIdentityDev.WebModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
-          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
-          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
-          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
-        </EntityType>
+    <Schema Namespace="AspnetIdentityDev.WebModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -65,7 +55,105 @@
           <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="NickName" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <EntityType Name="BackendMenu">
+          <Key>
+            <PropertyRef Name="MenuId" />
+          </Key>
+          <Property Name="MenuId" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Icon" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActiveController" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActiveAction" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActiveCssClass" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Sort" Type="tinyint" Nullable="false" />
+          <Property Name="IsVisible" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BackendMenuAction">
+          <Key>
+            <PropertyRef Name="ActionId" />
+          </Key>
+          <Property Name="ActionId" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ControllerName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActionName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Sort" Type="tinyint" Nullable="false" />
+          <Property Name="IsVisible" Type="bit" Nullable="false" />
+          <Property Name="MenuId" Type="tinyint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BackendMenuPermission">
+          <Key>
+            <PropertyRef Name="PermissionId" />
+          </Key>
+          <Property Name="PermissionId" Type="smallint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ActionId" Type="tinyint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="BackendUserPermission">
+          <Key>
+            <PropertyRef Name="PermissionId" />
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="PermissionId" Type="smallint" Nullable="false" />
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_BackendMenuAction_BackendMenu">
+          <End Role="BackendMenu" Type="Self.BackendMenu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BackendMenuAction" Type="Self.BackendMenuAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackendMenu">
+              <PropertyRef Name="MenuId" />
+            </Principal>
+            <Dependent Role="BackendMenuAction">
+              <PropertyRef Name="MenuId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BackendMenuPermission_BackendMenuAction">
+          <End Role="BackendMenuAction" Type="Self.BackendMenuAction" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BackendMenuPermission" Type="Self.BackendMenuPermission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackendMenuAction">
+              <PropertyRef Name="ActionId" />
+            </Principal>
+            <Dependent Role="BackendMenuPermission">
+              <PropertyRef Name="ActionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BackendUserPermission_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BackendUserPermission" Type="Self.BackendUserPermission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BackendUserPermission">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BackendUserPermission_BackendMenuPermission">
+          <End Role="BackendMenuPermission" Type="Self.BackendMenuPermission" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="BackendUserPermission" Type="Self.BackendUserPermission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackendMenuPermission">
+              <PropertyRef Name="PermissionId" />
+            </Principal>
+            <Dependent Role="BackendUserPermission">
+              <PropertyRef Name="PermissionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -123,12 +211,31 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="AspnetIdentityDevWebModelStoreContainer">
-          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BackendMenu" EntityType="Self.BackendMenu" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BackendMenuAction" EntityType="Self.BackendMenuAction" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BackendMenuPermission" EntityType="Self.BackendMenuPermission" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="BackendUserPermission" EntityType="Self.BackendUserPermission" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_BackendMenuAction_BackendMenu" Association="Self.FK_BackendMenuAction_BackendMenu">
+            <End Role="BackendMenu" EntitySet="BackendMenu" />
+            <End Role="BackendMenuAction" EntitySet="BackendMenuAction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BackendMenuPermission_BackendMenuAction" Association="Self.FK_BackendMenuPermission_BackendMenuAction">
+            <End Role="BackendMenuAction" EntitySet="BackendMenuAction" />
+            <End Role="BackendMenuPermission" EntitySet="BackendMenuPermission" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BackendUserPermission_AspNetUsers" Association="Self.FK_BackendUserPermission_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="BackendUserPermission" EntitySet="BackendUserPermission" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BackendUserPermission_BackendMenuPermission" Association="Self.FK_BackendUserPermission_BackendMenuPermission">
+            <End Role="BackendMenuPermission" EntitySet="BackendMenuPermission" />
+            <End Role="BackendUserPermission" EntitySet="BackendUserPermission" />
+          </AssociationSet>
           <AssociationSet Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="AspNetUserClaims" EntitySet="AspNetUserClaims" />
@@ -146,21 +253,10 @@
             <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="AspnetIdentityDev.WebModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="C__MigrationHistory">
-          <Key>
-            <PropertyRef Name="MigrationId" />
-            <PropertyRef Name="ContextKey" />
-          </Key>
-          <Property Name="MigrationId" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="ContextKey" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Model" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
-          <Property Name="ProductVersion" Type="String" MaxLength="32" FixedLength="false" Unicode="true" Nullable="false" />
-        </EntityType>
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
@@ -209,6 +305,8 @@
           <NavigationProperty Name="AspNetUserClaims" Relationship="Self.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserClaims" />
           <NavigationProperty Name="AspNetUserLogins" Relationship="Self.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" FromRole="AspNetUsers" ToRole="AspNetUserLogins" />
           <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
+          <Property Name="NickName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="BackendMenuPermission" Relationship="AspnetIdentityDev.WebModel.BackendUserPermission" FromRole="AspNetUsers" ToRole="BackendMenuPermission" />
         </EntityType>
         <Association Name="FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId">
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
@@ -243,7 +341,6 @@
           <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="*" />
         </Association>
         <EntityContainer Name="WebEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" />
           <EntitySet Name="AspNetUserClaims" EntityType="Self.AspNetUserClaims" />
           <EntitySet Name="AspNetUserLogins" EntityType="Self.AspNetUserLogins" />
@@ -260,23 +357,98 @@
             <End Role="AspNetRoles" EntitySet="AspNetRoles" />
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
           </AssociationSet>
+          <EntitySet Name="BackendMenu" EntityType="AspnetIdentityDev.WebModel.BackendMenu" />
+          <EntitySet Name="BackendMenuAction" EntityType="AspnetIdentityDev.WebModel.BackendMenuAction" />
+          <EntitySet Name="BackendMenuPermission" EntityType="AspnetIdentityDev.WebModel.BackendMenuPermission" />
+          <AssociationSet Name="FK_BackendMenuAction_BackendMenu" Association="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenu">
+            <End Role="BackendMenu" EntitySet="BackendMenu" />
+            <End Role="BackendMenuAction" EntitySet="BackendMenuAction" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BackendMenuPermission_BackendMenuAction" Association="AspnetIdentityDev.WebModel.FK_BackendMenuPermission_BackendMenuAction">
+            <End Role="BackendMenuAction" EntitySet="BackendMenuAction" />
+            <End Role="BackendMenuPermission" EntitySet="BackendMenuPermission" />
+          </AssociationSet>
+          <AssociationSet Name="BackendUserPermission" Association="AspnetIdentityDev.WebModel.BackendUserPermission">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="BackendMenuPermission" EntitySet="BackendMenuPermission" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="BackendMenu">
+          <Key>
+            <PropertyRef Name="MenuId" />
+          </Key>
+          <Property Name="MenuId" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Icon" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActiveController" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActiveAction" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActiveCssClass" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Sort" Type="Byte" Nullable="false" />
+          <Property Name="IsVisible" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="BackendMenuAction" Relationship="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenu" FromRole="BackendMenu" ToRole="BackendMenuAction" />
+        </EntityType>
+        <EntityType Name="BackendMenuAction">
+          <Key>
+            <PropertyRef Name="ActionId" />
+          </Key>
+          <Property Name="ActionId" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ControllerName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActionName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Sort" Type="Byte" Nullable="false" />
+          <Property Name="IsVisible" Type="Boolean" Nullable="false" />
+          <Property Name="MenuId" Type="Byte" Nullable="false" />
+          <NavigationProperty Name="BackendMenu" Relationship="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenu" FromRole="BackendMenuAction" ToRole="BackendMenu" />
+          <NavigationProperty Name="BackendMenuPermission" Relationship="AspnetIdentityDev.WebModel.FK_BackendMenuPermission_BackendMenuAction" FromRole="BackendMenuAction" ToRole="BackendMenuPermission" />
+        </EntityType>
+        <EntityType Name="BackendMenuPermission">
+          <Key>
+            <PropertyRef Name="PermissionId" />
+          </Key>
+          <Property Name="PermissionId" Type="Int16" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActionId" Type="Byte" Nullable="false" />
+          <NavigationProperty Name="BackendMenuAction" Relationship="AspnetIdentityDev.WebModel.FK_BackendMenuPermission_BackendMenuAction" FromRole="BackendMenuPermission" ToRole="BackendMenuAction" />
+          <NavigationProperty Name="AspNetUsers" Relationship="AspnetIdentityDev.WebModel.BackendUserPermission" FromRole="BackendMenuPermission" ToRole="AspNetUsers" />
+        </EntityType>
+        <Association Name="FK_BackendMenuAction_BackendMenu">
+          <End Type="AspnetIdentityDev.WebModel.BackendMenu" Role="BackendMenu" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="AspnetIdentityDev.WebModel.BackendMenuAction" Role="BackendMenuAction" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackendMenu">
+              <PropertyRef Name="MenuId" />
+            </Principal>
+            <Dependent Role="BackendMenuAction">
+              <PropertyRef Name="MenuId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BackendMenuPermission_BackendMenuAction">
+          <End Type="AspnetIdentityDev.WebModel.BackendMenuAction" Role="BackendMenuAction" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="AspnetIdentityDev.WebModel.BackendMenuPermission" Role="BackendMenuPermission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BackendMenuAction">
+              <PropertyRef Name="ActionId" />
+            </Principal>
+            <Dependent Role="BackendMenuPermission">
+              <PropertyRef Name="ActionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="BackendUserPermission">
+          <End Type="AspnetIdentityDev.WebModel.AspNetUsers" Role="AspNetUsers" Multiplicity="*" />
+          <End Type="AspnetIdentityDev.WebModel.BackendMenuPermission" Role="BackendMenuPermission" Multiplicity="*" />
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="AspnetIdentityDevWebModelStoreContainer" CdmEntityContainer="WebEntities">
-          <EntitySetMapping Name="C__MigrationHistory">
-            <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.C__MigrationHistory">
-              <MappingFragment StoreEntitySet="__MigrationHistory">
-                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
-                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
-                <ScalarProperty Name="Model" ColumnName="Model" />
-                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
             <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.AspNetRoles">
               <MappingFragment StoreEntitySet="AspNetRoles">
@@ -307,6 +479,7 @@
           <EntitySetMapping Name="AspNetUsers">
             <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.AspNetUsers">
               <MappingFragment StoreEntitySet="AspNetUsers">
+                <ScalarProperty Name="NickName" ColumnName="NickName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
@@ -325,6 +498,50 @@
           <AssociationSetMapping Name="AspNetUserRoles" TypeName="AspnetIdentityDev.WebModel.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
             <EndProperty Name="AspNetRoles">
               <ScalarProperty Name="Id" ColumnName="RoleId" />
+            </EndProperty>
+            <EndProperty Name="AspNetUsers">
+              <ScalarProperty Name="Id" ColumnName="UserId" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <EntitySetMapping Name="BackendMenu">
+            <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.BackendMenu">
+              <MappingFragment StoreEntitySet="BackendMenu">
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="Sort" ColumnName="Sort" />
+                <ScalarProperty Name="ActiveCssClass" ColumnName="ActiveCssClass" />
+                <ScalarProperty Name="ActiveAction" ColumnName="ActiveAction" />
+                <ScalarProperty Name="ActiveController" ColumnName="ActiveController" />
+                <ScalarProperty Name="Icon" ColumnName="Icon" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="MenuId" ColumnName="MenuId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BackendMenuAction">
+            <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.BackendMenuAction">
+              <MappingFragment StoreEntitySet="BackendMenuAction">
+                <ScalarProperty Name="MenuId" ColumnName="MenuId" />
+                <ScalarProperty Name="IsVisible" ColumnName="IsVisible" />
+                <ScalarProperty Name="Sort" ColumnName="Sort" />
+                <ScalarProperty Name="ActionName" ColumnName="ActionName" />
+                <ScalarProperty Name="ControllerName" ColumnName="ControllerName" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BackendMenuPermission">
+            <EntityTypeMapping TypeName="AspnetIdentityDev.WebModel.BackendMenuPermission">
+              <MappingFragment StoreEntitySet="BackendMenuPermission">
+                <ScalarProperty Name="ActionId" ColumnName="ActionId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="PermissionId" ColumnName="PermissionId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="BackendUserPermission" TypeName="AspnetIdentityDev.WebModel.BackendUserPermission" StoreEntitySet="BackendUserPermission">
+            <EndProperty Name="BackendMenuPermission">
+              <ScalarProperty Name="PermissionId" ColumnName="PermissionId" />
             </EndProperty>
             <EndProperty Name="AspNetUsers">
               <ScalarProperty Name="Id" ColumnName="UserId" />

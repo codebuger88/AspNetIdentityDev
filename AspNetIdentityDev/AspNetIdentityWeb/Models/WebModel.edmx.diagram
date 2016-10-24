@@ -5,7 +5,6 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="0ba4c5ce22b5446bb99fd4d4f27a27f4" Name="Diagram1">
-        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.C__MigrationHistory" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetRoles" Width="1.5" PointX="0.75" PointY="2.5" IsExpanded="true" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetUserClaims" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetUserLogins" Width="1.5" PointX="5.25" PointY="3.75" IsExpanded="true" />
@@ -13,6 +12,12 @@
         <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" ManuallyRouted="false" />
         <AssociationConnector Association="AspnetIdentityDev.WebModel.AspNetUserRoles" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenu" Width="1.5" PointX="3.75" PointY="7.125" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenuAction" Width="1.5" PointX="6" PointY="7.125" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenuPermission" Width="1.5" PointX="8.25" PointY="2.5" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenu" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenuPermission_BackendMenuAction" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.BackendUserPermission" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

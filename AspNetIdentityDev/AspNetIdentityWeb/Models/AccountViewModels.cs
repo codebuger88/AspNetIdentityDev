@@ -79,6 +79,13 @@ namespace AspNetIdentityWeb.Models
         [Display(Name = "確認密碼")]
         [Compare("Password", ErrorMessage = "密碼和確認密碼不相符。")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [Display(Name = "暱稱")]
+        public string NickName { get; set; }
+
+        public IEnumerable<BackendMenuAction> Actions { get; set; }
+        public IEnumerable<BackendMenuPermission> Permissions { get; set; }
     }
 
     public class ResetPasswordViewModel
