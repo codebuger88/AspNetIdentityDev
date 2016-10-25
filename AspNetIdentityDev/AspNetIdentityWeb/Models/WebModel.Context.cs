@@ -32,5 +32,6 @@ namespace AspNetIdentityWeb.Models
         public virtual DbSet<BackendMenu> BackendMenu { get; set; }
         public virtual DbSet<BackendMenuAction> BackendMenuAction { get; set; }
         public virtual DbSet<BackendMenuPermission> BackendMenuPermission { get; set; }
+        public virtual DbSet<BackendUserPermission> BackendUserPermission { get; set; }
     }
 }

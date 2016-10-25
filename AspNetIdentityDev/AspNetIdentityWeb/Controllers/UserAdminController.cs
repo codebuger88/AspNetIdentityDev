@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Web.Mvc;
 using AspNetIdentityWeb.Models;
 using AspNetIdentityWeb.Models.ViewModels;
 using Microsoft.AspNet.Identity.Owin;
+using WebGrease.Css.Extensions;
 
 namespace AspNetIdentityWeb.Controllers
 {
@@ -90,7 +92,12 @@ namespace AspNetIdentityWeb.Controllers
             {
                 ActionId = s.ActionId,
                 Name = s.Name,
-                Permissions = s.BackendMenuPermission/* _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
+                /* Permissions = _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
+                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                {
+                    Text = x.Name,
+                    Value = x.PermissionId.ToString()
+                })
             }).AsEnumerable();
 
             model.Actions = actions;
@@ -114,11 +121,25 @@ namespace AspNetIdentityWeb.Controllers
         //
         // POST: /Users/Create
         [HttpPost]
-        public async Task<ActionResult> Create(RegisterViewModel userViewModel, params string[] selectedRoles)
+        public async Task<ActionResult> Create(RegisterViewModel userViewModel, string[] permissions, params string[] selectedRoles)
         {
+            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            {
+                ActionId = s.ActionId,
+                Name = s.Name,
+                /* Permissions = _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
+                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                {
+                    Text = x.Name,
+                    Value = x.PermissionId.ToString()
+                })
+            }).AsEnumerable();
+
+            
+
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = userViewModel.Email, Email = userViewModel.Email };
+                var user = new ApplicationUser { UserName = userViewModel.Email, Email = userViewModel.Email, NickName = userViewModel.NickName};
                 var adminresult = await UserManager.CreateAsync(user, userViewModel.Password);
 
                 //Add User to the selected Roles 
@@ -131,21 +152,47 @@ namespace AspNetIdentityWeb.Controllers
                         {
                             ModelState.AddModelError("", result.Errors.First());
                             ViewBag.RoleId = new SelectList(await RoleManager.Roles.ToListAsync(), "Name", "Name");
-                            return View();
+
+                            userViewModel.Actions = actions;
+
+                            return View(userViewModel);
+
+                            //return View();
                         }
+
+                        //var permissions = userViewModel.Actions.Select(s => s.Permissions);
+
+                        foreach (var permission in permissions)
+                        {
+                            short permissionId = Convert.ToInt16(permission);
+                            _db.BackendUserPermission.Add(new BackendUserPermission()
+                            {
+                                PermissionId = permissionId,
+                                UserId = user.Id
+                            });
+                        }
+
+                        _db.SaveChanges();
                     }
                 }
                 else
                 {
                     ModelState.AddModelError("", adminresult.Errors.First());
                     ViewBag.RoleId = new SelectList(RoleManager.Roles, "Name", "Name");
-                    return View();
+
+                    userViewModel.Actions = actions;
+
+                    return View(userViewModel);
+                    //return View();
 
                 }
                 return RedirectToAction("Index");
             }
             ViewBag.RoleId = new SelectList(RoleManager.Roles, "Name", "Name");
-            return View();
+            userViewModel.Actions = actions;
+
+            return View(userViewModel);
+            //return View();
         }
 
         //

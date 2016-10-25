@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace AspNetIdentityWeb.Models
 {
@@ -77,7 +78,7 @@ namespace AspNetIdentityWeb.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "確認密碼")]
-        [Compare("Password", ErrorMessage = "密碼和確認密碼不相符。")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "密碼和確認密碼不相符。")]
         public string ConfirmPassword { get; set; }
 
         [Required]
@@ -95,7 +96,7 @@ namespace AspNetIdentityWeb.Models
 
         public string Name { get; set; }
 
-        public IEnumerable<BackendMenuPermission> Permissions { get; set; }
+        public IEnumerable<SelectListItem> Permissions { get; set; }
     }
 
     public class ResetPasswordViewModel
@@ -113,7 +114,7 @@ namespace AspNetIdentityWeb.Models
 
         [DataType(DataType.Password)]
         [Display(Name = "確認密碼")]
-        [Compare("Password", ErrorMessage = "密碼和確認密碼不相符。")]
+        [System.ComponentModel.DataAnnotations.Compare("Password", ErrorMessage = "密碼和確認密碼不相符。")]
         public string ConfirmPassword { get; set; }
 
         public string Code { get; set; }

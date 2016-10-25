@@ -17,7 +17,7 @@ namespace AspNetIdentityWeb.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public BackendMenuPermission()
         {
-            this.AspNetUsers = new HashSet<AspNetUsers>();
+            this.BackendUserPermission = new HashSet<BackendUserPermission>();
         }
     
         public short PermissionId { get; set; }
@@ -26,6 +26,6 @@ namespace AspNetIdentityWeb.Models
     
         public virtual BackendMenuAction BackendMenuAction { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUsers> AspNetUsers { get; set; }
+        public virtual ICollection<BackendUserPermission> BackendUserPermission { get; set; }
     }
 }

@@ -5,12 +5,18 @@
 
 <h2>@ViewBag.Title.</h2>
 
-@using (Html.BeginForm("Create", "UsersAdmin", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+@using (Html.BeginForm("Create", "UserAdmin", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
     <h4>Create a new account.</h4>
     <hr />
     @Html.ValidationSummary("", new { @class = "text-error" })
+    <div class="form-group">
+        @Html.LabelFor(m => m.NickName, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.NickName, new { @class = "form-control" })
+        </div>
+    </div>
     <div class="form-group">
         @Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -51,8 +57,8 @@
                 @(item.Name)<br />
                 foreach (var test in item.Permissions)
                 {
-                    <input type="checkbox" name="Permissions" value="@test.PermissionId" class="checkbox-inline" />
-                    @Html.Label(test.Name, new { @class = "control-label" })
+                    <input type="checkbox" name="Permissions" value="@test.Value" class="checkbox-inline" />
+                    @Html.Label(test.Text, new { @class = "control-label" })
                 }
                 <br />
             }
