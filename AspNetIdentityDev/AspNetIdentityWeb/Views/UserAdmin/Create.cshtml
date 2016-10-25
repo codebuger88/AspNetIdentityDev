@@ -49,9 +49,9 @@
             @foreach (var item in Model.Actions)
             {
                 @(item.Name)<br />
-                foreach (var test in Model.Permissions)
+                foreach (var test in item.Permissions)
                 {
-                    <input type="checkbox" name="SelectedRoles" value="@test.PermissionId" class="checkbox-inline" />
+                    <input type="checkbox" name="Permissions" value="@test.PermissionId" class="checkbox-inline" />
                     @Html.Label(test.Name, new { @class = "control-label" })
                 }
                 <br />

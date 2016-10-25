@@ -86,9 +86,14 @@ namespace AspNetIdentityWeb.Controllers
             //    testsss.BackendMenuPermission
             //}
 
-            model.Actions = _db.BackendMenuAction;
-            model.Permissions = Permissions(model.Actions);
-            
+            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            {
+                ActionId = s.ActionId,
+                Name = s.Name,
+                Permissions = s.BackendMenuPermission/* _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
+            }).AsEnumerable();
+
+            model.Actions = actions;
 
             return View(model);
         }

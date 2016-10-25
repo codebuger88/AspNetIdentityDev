@@ -84,7 +84,17 @@ namespace AspNetIdentityWeb.Models
         [Display(Name = "暱稱")]
         public string NickName { get; set; }
 
-        public IEnumerable<BackendMenuAction> Actions { get; set; }
+        
+
+        public IEnumerable<BackendMenuActionViewModel> Actions { get; set; }
+    }
+
+    public class BackendMenuActionViewModel
+    {
+        public int ActionId { get; set; }
+
+        public string Name { get; set; }
+
         public IEnumerable<BackendMenuPermission> Permissions { get; set; }
     }
 
