@@ -57,8 +57,9 @@
                 @(item.Name)<br />
                 foreach (var test in item.Permissions)
                 {
-                    <input type="checkbox" name="Permissions" value="@test.Value" class="checkbox-inline" />
-                    @Html.Label(test.Text, new { @class = "control-label" })
+                    @*@Html.EditorFor(m => m.Permissions, new { htmlAttributes = new { @class = "checkbox-inline", type = "checkbox", id = "Permissions" + test.Value, @Value = test.Value } })*@
+                    <input type="checkbox" name="Permissions" id="Permissions@(test.Value)" value="@test.Value" class="checkbox-inline"/>
+                    @Html.Label(test.Text, new { @class = "control-label", @for = "Permissions" + test.Value })
                 }
                 <br />
             }

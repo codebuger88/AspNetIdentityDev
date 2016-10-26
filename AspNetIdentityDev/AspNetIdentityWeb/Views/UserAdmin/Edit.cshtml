@@ -33,6 +33,22 @@
                 }
             </span>
         </div>
+        
+        <div class="form-group">
+            Select User Permission
+            <span class=" col-md-10">
+                @foreach (var item in Model.Actions)
+                {
+                    @(item.Name)<br />
+                    foreach (var test in item.Permissions)
+                    {
+                        <input type="checkbox" name="Permissions" id="Permissions@(test.Value)" value="@test.Value" checked="@test.Selected" class="checkbox-inline" />
+                        @Html.Label(test.Text, new { @class = "control-label", @for = "Permissions" + test.Value })
+                    }
+                    <br />
+                }
+            </span>
+        </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

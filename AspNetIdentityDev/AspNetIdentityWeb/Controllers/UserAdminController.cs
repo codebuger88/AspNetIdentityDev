@@ -9,7 +9,6 @@ using System.Web.Mvc;
 using AspNetIdentityWeb.Models;
 using AspNetIdentityWeb.Models.ViewModels;
 using Microsoft.AspNet.Identity.Owin;
-using WebGrease.Css.Extensions;
 
 namespace AspNetIdentityWeb.Controllers
 {
@@ -135,16 +134,31 @@ namespace AspNetIdentityWeb.Controllers
                 })
             }).AsEnumerable();
 
-            
+
 
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = userViewModel.Email, Email = userViewModel.Email, NickName = userViewModel.NickName};
+                var user = new ApplicationUser { UserName = userViewModel.Email, Email = userViewModel.Email, NickName = userViewModel.NickName };
                 var adminresult = await UserManager.CreateAsync(user, userViewModel.Password);
 
                 //Add User to the selected Roles 
                 if (adminresult.Succeeded)
                 {
+                    if (permissions != null)
+                    {
+                        foreach (var permission in permissions)
+                        {
+                            short permissionId = Convert.ToInt16(permission);
+                            _db.BackendUserPermission.Add(new BackendUserPermission()
+                            {
+                                PermissionId = permissionId,
+                                UserId = user.Id
+                            });
+                        }
+
+                        _db.SaveChanges();
+                    }
+
                     if (selectedRoles != null)
                     {
                         var result = await UserManager.AddToRolesAsync(user.Id, selectedRoles);
@@ -159,20 +173,6 @@ namespace AspNetIdentityWeb.Controllers
 
                             //return View();
                         }
-
-                        //var permissions = userViewModel.Actions.Select(s => s.Permissions);
-
-                        foreach (var permission in permissions)
-                        {
-                            short permissionId = Convert.ToInt16(permission);
-                            _db.BackendUserPermission.Add(new BackendUserPermission()
-                            {
-                                PermissionId = permissionId,
-                                UserId = user.Id
-                            });
-                        }
-
-                        _db.SaveChanges();
                     }
                 }
                 else
@@ -210,6 +210,18 @@ namespace AspNetIdentityWeb.Controllers
             }
 
             var userRoles = await UserManager.GetRolesAsync(user.Id);
+            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.PermissionId).ToList();
+            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            {
+                ActionId = s.ActionId,
+                Name = s.Name,
+                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                {
+                    Selected = userPermissions.Contains(x.PermissionId),
+                    Text = x.Name,
+                    Value = x.PermissionId.ToString()
+                })
+            }).AsEnumerable();
 
             return View(new EditUserViewModel()
             {
@@ -220,7 +232,8 @@ namespace AspNetIdentityWeb.Controllers
                     Selected = userRoles.Contains(x.Name),
                     Text = x.Name,
                     Value = x.Name
-                })
+                }),
+                Actions = actions
             });
         }
 
@@ -228,41 +241,103 @@ namespace AspNetIdentityWeb.Controllers
         // POST: /Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Email,Id")] EditUserViewModel editUser, params string[] selectedRole)
+        public async Task<ActionResult> Edit([Bind(Include = "Email,Id")] EditUserViewModel editUser, string[] permissions, params string[] selectedRole)
         {
+            var user = await UserManager.FindByIdAsync(editUser.Id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+            var userRoles = await UserManager.GetRolesAsync(user.Id);
+            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.PermissionId).ToList();
+            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            {
+                ActionId = s.ActionId,
+                Name = s.Name,
+                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                {
+                    Selected = userPermissions.Contains(x.PermissionId),
+                    Text = x.Name,
+                    Value = x.PermissionId.ToString()
+                })
+            }).AsEnumerable();
+
             if (ModelState.IsValid)
             {
-                var user = await UserManager.FindByIdAsync(editUser.Id);
-                if (user == null)
-                {
-                    return HttpNotFound();
-                }
+                //var user = await UserManager.FindByIdAsync(editUser.Id);
+                //if (user == null)
+                //{
+                //    return HttpNotFound();
+                //}
 
                 user.UserName = editUser.Email;
                 user.Email = editUser.Email;
 
-                var userRoles = await UserManager.GetRolesAsync(user.Id);
+                //var userRoles = await UserManager.GetRolesAsync(user.Id);
 
                 selectedRole = selectedRole ?? new string[] { };
 
                 var result = await UserManager.AddToRolesAsync(user.Id, selectedRole.Except(userRoles).ToArray<string>());
 
+
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", result.Errors.First());
-                    return View();
+                    editUser.Actions = actions;
+                    editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
+                    {
+                        Selected = userRoles.Contains(x.Name),
+                        Text = x.Name,
+                        Value = x.Name
+                    });
+
+                    return View(editUser);
                 }
                 result = await UserManager.RemoveFromRolesAsync(user.Id, userRoles.Except(selectedRole).ToArray<string>());
 
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", result.Errors.First());
-                    return View();
+
+                    editUser.Actions = actions;
+                    editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
+                    {
+                        Selected = userRoles.Contains(x.Name),
+                        Text = x.Name,
+                        Value = x.Name
+                    });
+                    return View(editUser);
                 }
+
+                foreach (var permission in permissions.Except(userPermissions.Select(s => s.ToString())))
+                {
+                    short permissionId = Convert.ToInt16(permission);
+                    _db.BackendUserPermission.Add(new BackendUserPermission()
+                    {
+                        PermissionId = permissionId,
+                        UserId = user.Id
+                    });
+                }
+
+                foreach (var permission in userPermissions.Select(s => s.ToString()).Except(permissions))
+                {
+                    short permissionId = Convert.ToInt16(permission);
+                    _db.BackendUserPermission.Remove(_db.BackendUserPermission.FirstOrDefault(x => x.PermissionId == permissionId && x.UserId == user.Id));
+                }
+
+                _db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             ModelState.AddModelError("", "Something failed.");
-            return View();
+            editUser.Actions = actions;
+            editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
+            {
+                Selected = userRoles.Contains(x.Name),
+                Text = x.Name,
+                Value = x.Name
+            });
+            return View(editUser);
         }
 
         //
