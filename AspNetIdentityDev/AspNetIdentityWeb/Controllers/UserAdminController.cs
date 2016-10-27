@@ -309,23 +309,26 @@ namespace AspNetIdentityWeb.Controllers
                     return View(editUser);
                 }
 
-                foreach (var permission in permissions.Except(userPermissions.Select(s => s.ToString())))
+                if (permissions != null)
                 {
-                    short permissionId = Convert.ToInt16(permission);
-                    _db.BackendUserPermission.Add(new BackendUserPermission()
+                    foreach (var permission in permissions.Except(userPermissions.Select(s => s.ToString())))
                     {
-                        PermissionId = permissionId,
-                        UserId = user.Id
-                    });
-                }
+                        short permissionId = Convert.ToInt16(permission);
+                        _db.BackendUserPermission.Add(new BackendUserPermission()
+                        {
+                            PermissionId = permissionId,
+                            UserId = user.Id
+                        });
+                    }
 
-                foreach (var permission in userPermissions.Select(s => s.ToString()).Except(permissions))
-                {
-                    short permissionId = Convert.ToInt16(permission);
-                    _db.BackendUserPermission.Remove(_db.BackendUserPermission.FirstOrDefault(x => x.PermissionId == permissionId && x.UserId == user.Id));
-                }
+                    foreach (var permission in userPermissions.Select(s => s.ToString()).Except(permissions))
+                    {
+                        short permissionId = Convert.ToInt16(permission);
+                        _db.BackendUserPermission.Remove(_db.BackendUserPermission.FirstOrDefault(x => x.PermissionId == permissionId && x.UserId == user.Id));
+                    }
 
-                _db.SaveChanges();
+                    _db.SaveChanges();
+                }
 
                 return RedirectToAction("Index");
             }
