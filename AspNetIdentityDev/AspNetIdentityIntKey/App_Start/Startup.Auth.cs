@@ -1,11 +1,10 @@
 ﻿using System;
+using AspNetIdentityIntKey.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Google;
 using Owin;
-using AspNetIdentityIntKey.Models;
 
 namespace AspNetIdentityIntKey
 {
@@ -30,9 +29,10 @@ namespace AspNetIdentityIntKey
                 {
                     // 讓應用程式在使用者登入時驗證安全性戳記。
                     // 這是您變更密碼或將外部登入新增至帳戶時所使用的安全性功能。  
-                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
+                    OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser, int>(
                         validateInterval: TimeSpan.FromMinutes(30),
-                        regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
+                        regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager), 
+                        getUserIdCallback:(id)=>(id.GetUserId<int>()))
                 }
             });            
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
