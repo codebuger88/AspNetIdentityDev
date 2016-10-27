@@ -15,7 +15,7 @@ namespace AspNetIdentityWeb.Models
     public partial class BackendUserPermission
     {
         public short PermissionId { get; set; }
-        public string UserId { get; set; }
+        public int UserId { get; set; }
     
         public virtual BackendMenuPermission BackendMenuPermission { get; set; }
     }

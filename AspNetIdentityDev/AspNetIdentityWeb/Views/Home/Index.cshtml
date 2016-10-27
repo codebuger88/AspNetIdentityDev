@@ -14,13 +14,13 @@
 </div>
 @{
     var db = new ApplicationDbContext();
-    var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
+    var userManager = new ApplicationUserManager(new ApplicationUserStore(db));
 
-    string userId = User.Identity.GetUserId();
+    var userId = User.Identity.GetUserId<int>();
 
     IList<string> roles = new List<string>();
 
-    if (!userId.IsNullOrWhiteSpace())
+    if (userId > 0)
     {
         roles = userManager.GetRoles(userId);
 
