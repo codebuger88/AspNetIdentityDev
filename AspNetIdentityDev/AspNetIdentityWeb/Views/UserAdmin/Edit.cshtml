@@ -37,13 +37,13 @@
         <div class="form-group">
             Select User Permission
             <span class=" col-md-10">
-                @foreach (var item in Model.Actions)
+                @foreach (var item in Model.Menus)
                 {
                     @(item.Name)<br />
-                    foreach (var test in item.Permissions)
+                    foreach (var test in item.Actions)
                     {
-                        <input type="checkbox" name="Permissions" id="Permissions@(test.Value)" value="@test.Value" checked="@test.Selected" class="checkbox-inline" />
-                        @Html.Label(test.Text, new { @class = "control-label", @for = "Permissions" + test.Value })
+                        <input type="checkbox" name="Actions" id="Actions@(test.Value)" value="@test.Value" checked="@test.Selected" class="checkbox-inline" />
+                        @Html.Label(test.Text, new { @class = "control-label", @for = "Actions" + test.Value })
                     }
                     <br />
                 }

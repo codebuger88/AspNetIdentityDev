@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -76,61 +75,38 @@ namespace AspNetIdentityWeb.Controllers
         {
             //Get the list of Roles
             ViewBag.RoleId = new SelectList(await RoleManager.Roles.ToListAsync(), "Name", "Name");
-            var test = _db.BackendMenu;
-            var qq = test.Include(s => s.BackendMenuAction).OrderBy(o => o.Sort);
-            var qq2 = _db.BackendMenuAction.Include(s => s.BackendMenuPermission);
-            ViewBag.Actions = test.Include(s => s.BackendMenuAction).OrderBy(o => o.Sort);
-            ViewBag.Permission = _db.BackendMenuAction.Include(s => s.BackendMenuPermission);
 
-            //foreach (var testsss in qq2)
-            //{
-            //    testsss.BackendMenuPermission
-            //}
-
-            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            var actions = _db.BackendMenu.Select(s => new BackendMenuViewModel()
             {
-                ActionId = s.ActionId,
+                MenuId = s.MenuId,
                 Name = s.Name,
-                /* Permissions = _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
-                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                /* Permissions = _db.BackendMenuAction.Where(x => x.ActionId == s.ActionId)*/
+                Actions = s.BackendMenuAction.ToList().Select(x => new SelectListItem()
                 {
                     Text = x.Name,
-                    Value = x.PermissionId.ToString()
+                    Value = x.ActionId.ToString()
                 })
             }).AsEnumerable();
 
-            model.Actions = actions;
+            model.Menus = actions;
 
             return View(model);
-        }
-
-        private IEnumerable<BackendMenuPermission> Permissions(IEnumerable<BackendMenuAction> model)
-        {
-            foreach (var action in model)
-            {
-                var data = _db.BackendMenuPermission.Where(x => x.ActionId == action.ActionId).AsEnumerable();
-
-                foreach (var i in data)
-                {
-                    yield return i;
-                }
-            }
         }
 
         //
         // POST: /Users/Create
         [HttpPost]
-        public async Task<ActionResult> Create(RegisterViewModel userViewModel, string[] permissions, params string[] selectedRoles)
+        public async Task<ActionResult> Create(RegisterViewModel userViewModel, string[] actions, params string[] selectedRoles)
         {
-            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            var menus = _db.BackendMenu.Select(s => new BackendMenuViewModel()
             {
-                ActionId = s.ActionId,
+                MenuId = s.MenuId,
                 Name = s.Name,
-                /* Permissions = _db.BackendMenuPermission.Where(x => x.ActionId == s.ActionId)*/
-                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                /* Permissions = _db.BackendMenuAction.Where(x => x.MenuId == s.MenuId)*/
+                Actions = s.BackendMenuAction.ToList().Select(x => new SelectListItem()
                 {
                     Text = x.Name,
-                    Value = x.PermissionId.ToString()
+                    Value = x.ActionId.ToString()
                 })
             }).AsEnumerable();
 
@@ -144,14 +120,14 @@ namespace AspNetIdentityWeb.Controllers
                 //Add User to the selected Roles 
                 if (adminresult.Succeeded)
                 {
-                    if (permissions != null)
+                    if (actions != null)
                     {
-                        foreach (var permission in permissions)
+                        foreach (var action in actions)
                         {
-                            short permissionId = Convert.ToInt16(permission);
+                            short actionId = Convert.ToInt16(action);
                             _db.BackendUserPermission.Add(new BackendUserPermission()
                             {
-                                PermissionId = permissionId,
+                                ActionId = actionId,
                                 UserId = user.Id
                             });
                         }
@@ -167,7 +143,7 @@ namespace AspNetIdentityWeb.Controllers
                             ModelState.AddModelError("", result.Errors.First());
                             ViewBag.RoleId = new SelectList(await RoleManager.Roles.ToListAsync(), "Name", "Name");
 
-                            userViewModel.Actions = actions;
+                            userViewModel.Menus = menus;
 
                             return View(userViewModel);
 
@@ -180,7 +156,7 @@ namespace AspNetIdentityWeb.Controllers
                     ModelState.AddModelError("", adminresult.Errors.First());
                     ViewBag.RoleId = new SelectList(RoleManager.Roles, "Name", "Name");
 
-                    userViewModel.Actions = actions;
+                    userViewModel.Menus = menus;
 
                     return View(userViewModel);
                     //return View();
@@ -189,7 +165,7 @@ namespace AspNetIdentityWeb.Controllers
                 return RedirectToAction("Index");
             }
             ViewBag.RoleId = new SelectList(RoleManager.Roles, "Name", "Name");
-            userViewModel.Actions = actions;
+            userViewModel.Menus = menus;
 
             return View(userViewModel);
             //return View();
@@ -210,16 +186,16 @@ namespace AspNetIdentityWeb.Controllers
             }
 
             var userRoles = await UserManager.GetRolesAsync(user.Id);
-            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.PermissionId).ToList();
-            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.ActionId).ToList();
+            var menus = _db.BackendMenu.Select(s => new BackendMenuViewModel()
             {
-                ActionId = s.ActionId,
+                MenuId = s.MenuId,
                 Name = s.Name,
-                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                Actions = s.BackendMenuAction.ToList().Select(x => new SelectListItem()
                 {
-                    Selected = userPermissions.Contains(x.PermissionId),
+                    Selected = userPermissions.Contains(x.ActionId),
                     Text = x.Name,
-                    Value = x.PermissionId.ToString()
+                    Value = x.ActionId.ToString()
                 })
             }).AsEnumerable();
 
@@ -233,7 +209,7 @@ namespace AspNetIdentityWeb.Controllers
                     Text = x.Name,
                     Value = x.Name
                 }),
-                Actions = actions
+                Menus = menus
             });
         }
 
@@ -241,7 +217,7 @@ namespace AspNetIdentityWeb.Controllers
         // POST: /Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Email,Id")] EditUserViewModel editUser, string[] permissions, params string[] selectedRole)
+        public async Task<ActionResult> Edit([Bind(Include = "Email,Id")] EditUserViewModel editUser, string[] actions, params string[] selectedRole)
         {
             var user = await UserManager.FindByIdAsync(editUser.Id);
             if (user == null)
@@ -249,16 +225,16 @@ namespace AspNetIdentityWeb.Controllers
                 return HttpNotFound();
             }
             var userRoles = await UserManager.GetRolesAsync(user.Id);
-            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.PermissionId).ToList();
-            var actions = _db.BackendMenuAction.Select(s => new BackendMenuActionViewModel()
+            var userPermissions = _db.BackendUserPermission.Where(x => x.UserId == user.Id).Select(s => s.ActionId).ToList();
+            var menus = _db.BackendMenu.Select(s => new BackendMenuViewModel()
             {
-                ActionId = s.ActionId,
+                MenuId = s.MenuId,
                 Name = s.Name,
-                Permissions = s.BackendMenuPermission.ToList().Select(x => new SelectListItem()
+                Actions = s.BackendMenuAction.ToList().Select(x => new SelectListItem()
                 {
-                    Selected = userPermissions.Contains(x.PermissionId),
+                    Selected = userPermissions.Contains(x.ActionId),
                     Text = x.Name,
-                    Value = x.PermissionId.ToString()
+                    Value = x.ActionId.ToString()
                 })
             }).AsEnumerable();
 
@@ -283,7 +259,7 @@ namespace AspNetIdentityWeb.Controllers
                 if (!result.Succeeded)
                 {
                     ModelState.AddModelError("", result.Errors.First());
-                    editUser.Actions = actions;
+                    editUser.Menus = menus;
                     editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
                     {
                         Selected = userRoles.Contains(x.Name),
@@ -299,7 +275,7 @@ namespace AspNetIdentityWeb.Controllers
                 {
                     ModelState.AddModelError("", result.Errors.First());
 
-                    editUser.Actions = actions;
+                    editUser.Menus = menus;
                     editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
                     {
                         Selected = userRoles.Contains(x.Name),
@@ -309,22 +285,22 @@ namespace AspNetIdentityWeb.Controllers
                     return View(editUser);
                 }
 
-                if (permissions != null)
+                if (actions != null)
                 {
-                    foreach (var permission in permissions.Except(userPermissions.Select(s => s.ToString())))
+                    foreach (var permission in actions.Except(userPermissions.Select(s => s.ToString())))
                     {
-                        short permissionId = Convert.ToInt16(permission);
+                        short ActionId = Convert.ToInt16(permission);
                         _db.BackendUserPermission.Add(new BackendUserPermission()
                         {
-                            PermissionId = permissionId,
+                            ActionId = ActionId,
                             UserId = user.Id
                         });
                     }
 
-                    foreach (var permission in userPermissions.Select(s => s.ToString()).Except(permissions))
+                    foreach (var permission in userPermissions.Select(s => s.ToString()).Except(actions))
                     {
-                        short permissionId = Convert.ToInt16(permission);
-                        _db.BackendUserPermission.Remove(_db.BackendUserPermission.FirstOrDefault(x => x.PermissionId == permissionId && x.UserId == user.Id));
+                        short ActionId = Convert.ToInt16(permission);
+                        _db.BackendUserPermission.Remove(_db.BackendUserPermission.FirstOrDefault(x => x.ActionId == ActionId && x.UserId == user.Id));
                     }
 
                     _db.SaveChanges();
@@ -333,7 +309,7 @@ namespace AspNetIdentityWeb.Controllers
                 return RedirectToAction("Index");
             }
             ModelState.AddModelError("", "Something failed.");
-            editUser.Actions = actions;
+            editUser.Menus = menus;
             editUser.RolesList = RoleManager.Roles.ToList().Select(x => new SelectListItem()
             {
                 Selected = userRoles.Contains(x.Name),

@@ -17,19 +17,15 @@ namespace AspNetIdentityWeb.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public BackendMenuAction()
         {
-            this.BackendMenuPermission = new HashSet<BackendMenuPermission>();
+            this.BackendUserPermission = new HashSet<BackendUserPermission>();
         }
     
-        public byte ActionId { get; set; }
+        public short ActionId { get; set; }
         public string Name { get; set; }
-        public string ControllerName { get; set; }
-        public string ActionName { get; set; }
-        public byte Sort { get; set; }
-        public bool IsVisible { get; set; }
         public byte MenuId { get; set; }
     
         public virtual BackendMenu BackendMenu { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BackendMenuPermission> BackendMenuPermission { get; set; }
+        public virtual ICollection<BackendUserPermission> BackendUserPermission { get; set; }
     }
 }

@@ -22,6 +22,6 @@ namespace AspNetIdentityWeb.Models.ViewModels
         public string Email { get; set; }
 
         public IEnumerable<SelectListItem> RolesList { get; set; }
-        public IEnumerable<BackendMenuActionViewModel> Actions { get; set; }
+        public IEnumerable<BackendMenuViewModel> Menus { get; set; }
     }
 }

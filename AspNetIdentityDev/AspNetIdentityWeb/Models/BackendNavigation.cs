@@ -12,20 +12,24 @@ namespace AspNetIdentityWeb.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class BackendMenuPermission
+    public partial class BackendNavigation
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public BackendMenuPermission()
+        public BackendNavigation()
         {
-            this.BackendUserPermission = new HashSet<BackendUserPermission>();
+            this.BackendMenu = new HashSet<BackendMenu>();
         }
     
-        public short PermissionId { get; set; }
+        public byte NavigationId { get; set; }
         public string Name { get; set; }
-        public byte ActionId { get; set; }
+        public string Icon { get; set; }
+        public string ActiveController { get; set; }
+        public string ActiveAction { get; set; }
+        public string ActiveCssClass { get; set; }
+        public byte Sort { get; set; }
+        public bool IsVisible { get; set; }
     
-        public virtual BackendMenuAction BackendMenuAction { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BackendUserPermission> BackendUserPermission { get; set; }
+        public virtual ICollection<BackendMenu> BackendMenu { get; set; }
     }
 }

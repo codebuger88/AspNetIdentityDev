@@ -52,14 +52,14 @@
             Select User Permission
         </label>
         <div class="col-md-10">
-            @foreach (var item in Model.Actions)
+            @foreach (var item in Model.Menus)
             {
                 @(item.Name)<br />
-                foreach (var test in item.Permissions)
+                foreach (var test in item.Actions)
                 {
                     @*@Html.EditorFor(m => m.Permissions, new { htmlAttributes = new { @class = "checkbox-inline", type = "checkbox", id = "Permissions" + test.Value, @Value = test.Value } })*@
-                    <input type="checkbox" name="Permissions" id="Permissions@(test.Value)" value="@test.Value" class="checkbox-inline"/>
-                    @Html.Label(test.Text, new { @class = "control-label", @for = "Permissions" + test.Value })
+                    <input type="checkbox" name="Actions" id="Permissions@(test.Value)" value="@test.Value" class="checkbox-inline"/>
+                    @Html.Label(test.Text, new { @class = "control-label", @for = "Actions" + test.Value })
                 }
                 <br />
             }

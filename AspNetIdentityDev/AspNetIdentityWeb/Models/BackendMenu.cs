@@ -22,13 +22,13 @@ namespace AspNetIdentityWeb.Models
     
         public byte MenuId { get; set; }
         public string Name { get; set; }
-        public string Icon { get; set; }
-        public string ActiveController { get; set; }
-        public string ActiveAction { get; set; }
-        public string ActiveCssClass { get; set; }
+        public string ControllerName { get; set; }
+        public string ActionName { get; set; }
         public byte Sort { get; set; }
         public bool IsVisible { get; set; }
+        public byte NavigationId { get; set; }
     
+        public virtual BackendNavigation BackendNavigation { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BackendMenuAction> BackendMenuAction { get; set; }
     }

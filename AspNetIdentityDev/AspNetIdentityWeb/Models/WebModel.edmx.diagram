@@ -9,15 +9,15 @@
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetUserClaims" Width="1.5" PointX="5.25" PointY="3.5" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetUserLogins" Width="1.5" PointX="5.25" PointY="1" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.AspNetUsers" Width="1.5" PointX="3" PointY="1.25" />
-        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenu" Width="1.5" PointX="0.75" PointY="7" />
-        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenuAction" Width="1.5" PointX="3" PointY="7" />
-        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenuPermission" Width="1.5" PointX="5.25" PointY="7.375" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenu" Width="1.5" PointX="3" PointY="7" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendMenuAction" Width="1.5" PointX="5.25" PointY="7.375" />
+        <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendNavigation" Width="1.5" PointX="0.75" PointY="7" />
         <EntityTypeShape EntityType="AspnetIdentityDev.WebModel.BackendUserPermission" Width="1.5" PointX="7.5" PointY="7.5" />
         <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
         <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
-        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenu" />
-        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenuPermission_BackendMenuAction" />
-        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendUserPermission_BackendMenuPermission" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenu_BackendNavigation" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendMenuAction_BackendMenuAction" />
+        <AssociationConnector Association="AspnetIdentityDev.WebModel.FK_BackendUserPermission_BackendUserPermission" />
         <AssociationConnector Association="AspnetIdentityDev.WebModel.AspNetUserRoles" />
       </Diagram>
     </edmx:Diagrams>

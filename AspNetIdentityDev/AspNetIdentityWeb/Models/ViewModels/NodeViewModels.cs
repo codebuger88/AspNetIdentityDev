@@ -4,7 +4,7 @@ namespace AspNetIdentityWeb.Models.ViewModels
 {
     public class NodeViewModels
     {
+        public List<BackendMenu> Menus { get; set; }
         public List<BackendMenuAction> Actions { get; set; }
-        public List<BackendMenuPermission> Permissions { get; set; }
     }
 }
